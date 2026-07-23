@@ -1057,6 +1057,26 @@ body {
   margin-top: -4px;
 }
 
+
+/* ─ Day navigation bar ─ */
+.tag-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.tag-nav-btn {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.65);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 0;
+  letter-spacing: 0.2px;
+}
+.tag-nav-btn:active { color: #fff; }
+
 </style>
 </head>
 <body>
@@ -1377,7 +1397,10 @@ body {
     <!-- Tag 1 -->
     <div id="tag1-view">
       <div class="tag-header">
-        <button class="back-btn" style="position:static;color:rgba(255,255,255,0.6);background:none;border:none;font-size:22px;cursor:pointer;margin-bottom:8px;padding:0" onclick="switchTab('uebersicht')">‹ Übersicht</button>
+        <div class="tag-nav">
+          <button class="tag-nav-btn" onclick="switchTab('uebersicht')">‹ Übersicht</button>
+          <button class="tag-nav-btn" onclick="showTag2()">Samstag ›</button>
+        </div>
         <div class="tag-badge">Tag 1 · Freitag</div>
         <div class="tag-title">Schneeberg &amp; Anreise</div>
         <div class="tag-date">28. August 2026</div>
@@ -1474,7 +1497,10 @@ body {
     <!-- Tag 2 -->
     <div id="tag2-view" style="display:none">
       <div class="tag-header" style="background: #5a3020">
-        <button class="back-btn" style="position:static;color:rgba(255,255,255,0.6);background:none;border:none;font-size:22px;cursor:pointer;margin-bottom:8px;padding:0" onclick="switchTab('uebersicht')">‹ Übersicht</button>
+        <div class="tag-nav">
+          <button class="tag-nav-btn" onclick="showTag1()">‹ Freitag</button>
+          <button class="tag-nav-btn" onclick="showTag3()">Sonntag ›</button>
+        </div>
         <div class="tag-badge" style="background:var(--burgundy);color:#fff">Tag 2 · Samstag 🎂</div>
         <div class="tag-title">Geburtstag</div>
         <div class="tag-date">29. August 2026 · Happy Birthday, Marcela! 🤍</div>
@@ -1549,7 +1575,10 @@ body {
     <!-- Tag 3 -->
     <div id="tag3-view" style="display:none">
       <div class="tag-header" style="background:#2a4060">
-        <button class="back-btn" style="position:static;color:rgba(255,255,255,0.6);background:none;border:none;font-size:22px;cursor:pointer;margin-bottom:8px;padding:0" onclick="switchTab('uebersicht')">‹ Übersicht</button>
+        <div class="tag-nav">
+          <button class="tag-nav-btn" onclick="showTag2()">‹ Samstag</button>
+          <button class="tag-nav-btn" onclick="switchTab('uebersicht')">Übersicht ›</button>
+        </div>
         <div class="tag-badge" style="background:var(--blue);color:#fff">Tag 3 · Sonntag</div>
         <div class="tag-title">Abschied &amp; Heimreise</div>
         <div class="tag-date">30. August 2026</div>
@@ -1805,10 +1834,6 @@ body {
       <span class="tab-icon">🏠</span>
       <span class="tab-label">Übersicht</span>
     </button>
-    <button class="tab-btn" id="tab-btn-reiseplan" onclick="switchTab('reiseplan')">
-      <span class="tab-icon">📖</span>
-      <span class="tab-label">Reiseplan</span>
-    </button>
     <button class="tab-btn" id="tab-btn-karte" onclick="switchTab('karte')">
       <span class="tab-icon">🗺️</span>
       <span class="tab-label">Karte</span>
@@ -1923,31 +1948,34 @@ function switchTab(name) {
   else document.getElementById('screen-app').scrollTop = 0;
 }
 
+
+// ─── SHARED DAY HELPER ───
+function _showDay(n) {
+  // Activate reiseplan tab panel (needed on mobile where tab still exists in DOM)
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-reiseplan').classList.add('active');
+  // Update tab buttons (mobile)
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  // Update sidebar (desktop)
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+  if(document.getElementById('sb-reiseplan')) document.getElementById('sb-reiseplan').classList.add('active');
+  if(document.getElementById('sb-tag'+n)) document.getElementById('sb-tag'+n).classList.add('active');
+  // Show correct day
+  [1,2,3].forEach(i => {
+    document.getElementById('tag'+i+'-view').style.display = (i===n) ? 'block' : 'none';
+  });
+  const scroll = document.querySelector('.app-main-scroll');
+  if(scroll) scroll.scrollTop = 0;
+}
+
 function showTag1() {
-  switchTab('reiseplan');
-  document.querySelectorAll('.sidebar-item.sub').forEach(b => b.classList.remove('active'));
-  if(document.getElementById('sb-tag1')) document.getElementById('sb-tag1').classList.add('active');
-  document.getElementById('tag1-view').style.display = 'block';
-  document.getElementById('tag2-view').style.display = 'none';
-  document.getElementById('tag3-view').style.display = 'none';
+  _showDay(1);
 }
 function showTag2() {
-  switchTab('reiseplan');
-  document.querySelectorAll('.sidebar-item.sub').forEach(b => b.classList.remove('active'));
-  if(document.getElementById('sb-tag2')) document.getElementById('sb-tag2').classList.add('active');
-  document.getElementById('tag1-view').style.display = 'none';
-  document.getElementById('tag2-view').style.display = 'block';
-  document.getElementById('tag3-view').style.display = 'none';
-  document.getElementById('screen-app').scrollTop = 0;
+  _showDay(2);
 }
 function showTag3() {
-  switchTab('reiseplan');
-  document.querySelectorAll('.sidebar-item.sub').forEach(b => b.classList.remove('active'));
-  if(document.getElementById('sb-tag3')) document.getElementById('sb-tag3').classList.add('active');
-  document.getElementById('tag1-view').style.display = 'none';
-  document.getElementById('tag2-view').style.display = 'none';
-  document.getElementById('tag3-view').style.display = 'block';
-  document.getElementById('screen-app').scrollTop = 0;
+  _showDay(3);
 }
 
 // ─── CHECK IF ALREADY REVEALED ───
